@@ -4,9 +4,7 @@ import org.apache.predictionio.controller.P2LAlgorithm
 import org.apache.predictionio.controller.Params
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession, functions}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import grizzled.slf4j.Logger
 import org.apache.spark.mllib.regression.LabeledPoint
@@ -21,7 +19,8 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
   def train(sc: SparkContext, pd: PreparedData): LRModel = {
 
     // Import SQLContext for creating DataFrame.
-    val sql: SQLContext = new SQLContext(sc)
+    //val sql: SQLContext = new SQLContext(sc)
+    val sql: SQLContext = SparkSession.builder().config(sc.getConf).getOrCreate().sqlContext
     import sql.implicits._
 
     val lr = new LogisticRegression()
@@ -52,7 +51,6 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
         val fit = lr.setLabelCol(lab).fit(
           data.select(lab, "features")
         )
-
         // Return (label, feature coefficients, and intercept term.
         (label, LREstimate(fit.coefficients.toArray, fit.intercept))
 
@@ -89,7 +87,6 @@ class LRModel(
   /** Define prediction rule. */
   def predict(text: String): PredictedResult = {
     val x: Array[Double] = tfIdf.transform(text).toArray
-
     // Logistic Regression binary formula for positive probability.
     // According to MLLib documentation, class labeled 0 is used as pivot.
     // Thus, we are using:
@@ -103,7 +100,6 @@ class LRModel(
         (e._1, z / (1 + z))
       }
     ).maxBy(_._2)
-
     PredictedResult(categoryMap(pred._1), pred._2)
   }
 

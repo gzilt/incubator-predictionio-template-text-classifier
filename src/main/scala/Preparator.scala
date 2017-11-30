@@ -18,6 +18,8 @@ import java.io.StringReader
 
 import scala.collection.mutable
 
+import grizzled.slf4j.Logger
+
 /** Define Preparator parameters. Recall that for our data
   * representation we are only required to input the n-gram window
   * components.
@@ -30,6 +32,8 @@ case class PreparatorParams(
 /** define your Preparator class */
 class Preparator(pp: PreparatorParams)
   extends PPreparator[TrainingData, PreparedData] {
+
+  @transient lazy val logger = Logger[this.type]
 
   def prepare(sc: SparkContext, td: TrainingData): PreparedData = {
 
@@ -70,23 +74,25 @@ class TFHasher(
 
   private val hasher = new HashingTF(numFeatures = numFeatures)
 
-/** Use Lucene StandardAnalyzer to tokenize text **/
- def tokenize(content: String): Seq[String] = {
-    val tReader = new StringReader(content)
-    val analyzer = new StandardAnalyzer()
-    val tStream = analyzer.tokenStream("contents", tReader)
-    val term = tStream.addAttribute(classOf[CharTermAttribute])
-    tStream.reset()
+  @transient lazy val logger = Logger[this.type]
 
-    val result = mutable.ArrayBuffer.empty[String]
-    while (tStream.incrementToken()) {
-      val termValue = term.toString
+  /** Use Lucene StandardAnalyzer to tokenize text **/
+   def tokenize(content: String): Seq[String] = {
+      val tReader = new StringReader(content)
+      val analyzer = new StandardAnalyzer()
+      val tStream = analyzer.tokenStream("contents", tReader)
+      val term = tStream.addAttribute(classOf[CharTermAttribute])
+      tStream.reset()
 
-        result += term.toString
+      val result = mutable.ArrayBuffer.empty[String]
+      while (tStream.incrementToken()) {
+        val termValue = term.toString
 
-    }
-    result
-}
+          result += term.toString
+
+      }
+      result
+  }
 
 
   /** Hashing function: Text -> term frequency vector. */
@@ -105,6 +111,8 @@ class TFIDFModel(
   val hasher: TFHasher,
   val idf: IDFModel
 ) extends Serializable {
+
+  @transient lazy val logger = Logger[this.type]
 
   /** trasform text to tf-idf vector. */
   def transform(text: String): Vector = {

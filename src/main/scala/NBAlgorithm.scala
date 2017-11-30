@@ -44,17 +44,22 @@ class NBModel(
 ) extends Serializable {
 
   private def innerProduct (x : Array[Double], y : Array[Double]) : Double = {
-    x.zip(y).map(e => e._1 * e._2).sum
+    // remove NaN values
+    x.zip(y).map(e => {
+      val z = e._1 * e._2
+      if (z.isNaN || z.isInfinity || z.isNegInfinity || z.isInfinite)
+        0.00
+      else
+        z
+    }).sum
   }
 
   val normalize = (u: Array[Double]) => {
     val uSum = u.sum
-
     u.map(e => e / uSum)
   }
 
   private val scoreArray = nb.pi.zip(nb.theta)
-
   /** Given a document string, return a vector of corresponding
     * class membership probabilities.
     * Helper function used to normalize probability scores.
@@ -63,7 +68,6 @@ class NBModel(
   private def getScores(doc: String): Array[Double] = {
     // Vectorize query
     val x: Vector = tfIdf.transform(doc)
-
     val z = scoreArray
       .map(e => innerProduct(e._2, x.toArray) + e._1)
 
