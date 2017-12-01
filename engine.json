@@ -4,14 +4,15 @@
   "engineFactory": "org.example.textclassification.TextClassificationEngine",
   "datasource": {
     "params": {
-      "appName": "MyTextApp"
+      "appName": "pio-text-classifier"
     }
   },
   "preparator": {
     "params": {
       "nGram": 1,
       "numFeatures": 500,
-      "SPPMI": false
+      "SPPMI": false,
+      "locale": "en"
     }
   },
   "algorithms": [

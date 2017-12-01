@@ -4,14 +4,15 @@ import org.apache.predictionio.controller.PPreparator
 import org.apache.predictionio.controller.Params
 
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
 import org.apache.spark.mllib.feature.{IDF, IDFModel, HashingTF}
 import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer
+import org.apache.lucene.analysis.en.EnglishAnalyzer
+import org.apache.lucene.analysis.id.IndonesianAnalyzer
+import org.apache.lucene.analysis.th.ThaiAnalyzer
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 
 import java.io.StringReader
@@ -26,7 +27,9 @@ import grizzled.slf4j.Logger
   */
 case class PreparatorParams(
   nGram: Int,
-  numFeatures: Int = 15000
+  numFeatures: Int = 15000,
+  sppmi: Boolean,
+  locale: String
 ) extends Params
 
 /** define your Preparator class */
@@ -37,7 +40,7 @@ class Preparator(pp: PreparatorParams)
 
   def prepare(sc: SparkContext, td: TrainingData): PreparedData = {
 
-    val tfHasher = new TFHasher(pp.numFeatures, pp.nGram, td.stopWords)
+    val tfHasher = new TFHasher(pp.numFeatures, pp.nGram, td.stopWords, pp.locale)
 
     // Convert trainingdata's observation text into TF vector
     // and then fit a IDF model
@@ -69,7 +72,8 @@ class Preparator(pp: PreparatorParams)
 class TFHasher(
   val numFeatures: Int,
   val nGram: Int,
-  val stopWords:Set[String]
+  val stopWords:Set[String],
+  val locale: String
 ) extends Serializable {
 
   private val hasher = new HashingTF(numFeatures = numFeatures)
@@ -79,7 +83,14 @@ class TFHasher(
   /** Use Lucene StandardAnalyzer to tokenize text **/
    def tokenize(content: String): Seq[String] = {
       val tReader = new StringReader(content)
-      val analyzer = new StandardAnalyzer()
+
+     val analyzer = locale match {
+        case "en" =>  new EnglishAnalyzer()
+        case "th" => new ThaiAnalyzer()
+        case "id" => new IndonesianAnalyzer()
+        case _ => new StandardAnalyzer()
+      }
+
       val tStream = analyzer.tokenStream("contents", tReader)
       val term = tStream.addAttribute(classOf[CharTermAttribute])
       tStream.reset()
@@ -87,9 +98,7 @@ class TFHasher(
       val result = mutable.ArrayBuffer.empty[String]
       while (tStream.incrementToken()) {
         val termValue = term.toString
-
           result += term.toString
-
       }
       result
   }

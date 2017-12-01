@@ -38,7 +38,6 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
       (data: DataFrame, label: Double) => {
         // function: multiclass labels --> binary labels
         val f: UserDefinedFunction = functions.udf((e : Double) => if (e == label) 1.0 else 0.0)
-
         data.withColumn(label.toInt.toString, f(data("label")))
       }
     )
@@ -47,13 +46,11 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
     val lrModels : Seq[(Double, LREstimate)] = labels.map(
       label => {
         val lab = label.toInt.toString
-
         val fit = lr.setLabelCol(lab).fit(
           data.select(lab, "features")
         )
         // Return (label, feature coefficients, and intercept term.
         (label, LREstimate(fit.coefficients.toArray, fit.intercept))
-
       }
     )
 
