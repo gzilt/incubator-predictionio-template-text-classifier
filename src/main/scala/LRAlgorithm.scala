@@ -8,11 +8,12 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession, functions}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import grizzled.slf4j.Logger
 import org.apache.spark.mllib.regression.LabeledPoint
+import scala.collection.mutable.ListBuffer
 
 case class LRAlgorithmParams(regParam: Double, maxIteration: Int, threshold: Double) extends Params
 
 class LRAlgorithm(val ap: LRAlgorithmParams)
-  extends P2LAlgorithm[PreparedData, LRModel, Query, PredictedResult] {
+  extends P2LAlgorithm[PreparedData, LRModel, Query, PredictedResults] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -60,7 +61,7 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
     )
   }
 
-  def predict(model: LRModel, query: Query): PredictedResult = {
+  def predict(model: LRModel, query: Query): PredictedResults = {
     model.predict(query.text)
   }
 }
@@ -81,7 +82,7 @@ class LRModel(
   }
 
   /** Define prediction rule. */
-  def predict(text: String): PredictedResult = {
+  def predict(text: String): PredictedResults = {
     val x: Array[Double] = tfIdf.transform(text).toArray
     // Logistic Regression binary formula for positive probability.
     // According to MLLib documentation, class labeled 0 is used as pivot.
@@ -90,13 +91,19 @@ class LRModel(
     // p1 = exp(z) * (1 - p1)
     // p1 * (1 + exp(z)) = exp(z)
     // p1 = exp(z)/(1 + exp(z))
-    val pred = lrModels.map(
+    val predTest = lrModels.map(
       e => {
         val z = scala.math.exp(innerProduct(e._2.coefficients, x) + e._2.intercept)
         (e._1, z / (1 + z))
       }
-    ).maxBy(_._2)
-    PredictedResult(categoryMap(pred._1), pred._2)
+    )
+
+    val sorted = predTest.sortWith(_._2 > _._2)
+    val resultList = new ListBuffer[(PredictedResult)]()
+    sorted.foreach(item => {
+      if (item._2 > 0.001) resultList.append(PredictedResult(categoryMap(item._1), item._2))
+    })
+    PredictedResults(resultList)
   }
 
   override def toString = s"LR model"

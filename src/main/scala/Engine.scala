@@ -16,6 +16,8 @@ case class PredictedResult(
   category: String,
   confidence: Double)
 
+case class PredictedResults(predictions: Seq[PredictedResult])
+
 /** Define ActualResult class which serves as a wrapper
   * for an observation's true class label.
   */

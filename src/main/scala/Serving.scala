@@ -3,11 +3,11 @@ package org.example.textclassification
 import org.apache.predictionio.controller.LServing
 
 class Serving
-  extends LServing[Query, PredictedResult] {
+  extends LServing[Query, PredictedResults] {
 
   override
   def serve(query: Query,
-      predictedResults: Seq[PredictedResult]): PredictedResult = {
-    predictedResults.maxBy(e => e.confidence)
+            predictedResults: Seq[PredictedResults]): PredictedResults = {
+    predictedResults.head
   }
 }

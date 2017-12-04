@@ -7,6 +7,7 @@ import org.apache.spark.mllib.classification.NaiveBayes
 import org.apache.spark.mllib.classification.NaiveBayesModel
 import org.apache.spark.mllib.linalg.Vector
 
+import scala.collection.mutable.ListBuffer
 import scala.math._
 
 /** Define parameters for Supervised Learning Model. We are
@@ -18,7 +19,7 @@ case class NBAlgorithmParams(lambda: Double) extends Params
 /** Define SupervisedAlgorithm class. */
 class NBAlgorithm(
   val ap: NBAlgorithmParams
-) extends P2LAlgorithm[PreparedData, NBModel, Query, PredictedResult] {
+) extends P2LAlgorithm[PreparedData, NBModel, Query, PredictedResults] {
 
   /** Train your model. */
   def train(sc: SparkContext, pd: PreparedData): NBModel = {
@@ -32,7 +33,7 @@ class NBAlgorithm(
   }
 
   /** Prediction method for trained model. */
-  def predict(model: NBModel, query: Query): PredictedResult = {
+  def predict(model: NBModel, query: Query): PredictedResults = {
     model.predict(query.text)
   }
 }
@@ -77,9 +78,14 @@ class NBModel(
   /** Implement predict method for our model using
     * the prediction rule given in tutorial.
     */
-  def predict(doc : String) : PredictedResult = {
+  def predict(doc : String) : PredictedResults = {
     val x: Array[Double] = getScores(doc)
-    val y: (Double, Double) = (nb.labels zip x).maxBy(_._2)
-    PredictedResult(categoryMap.getOrElse(y._1, ""), y._2)
+    val y = nb.labels zip x
+    val sorted = y.sortWith(_._2 > _._2)
+    val resultList = new ListBuffer[(PredictedResult)]()
+    sorted.foreach(item => {
+      if (item._2 > 0.001) resultList.append(PredictedResult(categoryMap.getOrElse(item._1, ""), item._2))
+    })
+    PredictedResults(resultList)
   }
 }

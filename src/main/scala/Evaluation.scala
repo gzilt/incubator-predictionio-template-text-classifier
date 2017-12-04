@@ -1,5 +1,6 @@
 package org.example.textclassification
 
+
 import org.apache.predictionio.controller.AverageMetric
 import org.apache.predictionio.controller.Evaluation
 import org.apache.predictionio.controller.EmptyEvaluationInfo
@@ -8,14 +9,17 @@ import org.apache.predictionio.controller.EngineParams
 
 /** Create an accuracy metric for evaluating our supervised learning model. */
 case class Accuracy()
-  extends AverageMetric[EmptyEvaluationInfo, Query, PredictedResult, ActualResult] {
+  extends AverageMetric[EmptyEvaluationInfo, Query, PredictedResults, ActualResult] {
 
   /** Method for calculating prediction accuracy. */
   def calculate(
     query: Query,
-    predicted: PredictedResult,
+    predicted: PredictedResults,
     actual: ActualResult
-  ) : Double = if (predicted.category == actual.category) 1.0 else 0.0
+  ) : Double = {
+    val result = predicted.predictions.maxBy(_.confidence)
+    if (result.category == actual.category) 1.0 else 0.0
+  }
 }
 
 
