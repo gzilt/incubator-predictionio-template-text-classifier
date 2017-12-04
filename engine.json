@@ -11,7 +11,6 @@
     "params": {
       "nGram": 1,
       "numFeatures": 500,
-      "SPPMI": false,
       "locale": "en"
     }
   },
@@ -19,7 +18,9 @@
     {
       "name": "lr",
       "params": {
-        "regParam": 0.00000005
+        "regParam": 0.00000005,
+        "maxIteration": 10,
+        "threshold": 0.5
       }
     }
   ]

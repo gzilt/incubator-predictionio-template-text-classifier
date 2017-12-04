@@ -9,7 +9,7 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import grizzled.slf4j.Logger
 import org.apache.spark.mllib.regression.LabeledPoint
 
-case class LRAlgorithmParams(regParam: Double) extends Params
+case class LRAlgorithmParams(regParam: Double, maxIteration: Int, threshold: Double) extends Params
 
 class LRAlgorithm(val ap: LRAlgorithmParams)
   extends P2LAlgorithm[PreparedData, LRModel, Query, PredictedResult] {
@@ -17,15 +17,14 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
   @transient lazy val logger = Logger[this.type]
 
   def train(sc: SparkContext, pd: PreparedData): LRModel = {
-
     // Import SQLContext for creating DataFrame.
     //val sql: SQLContext = new SQLContext(sc)
     val sql: SQLContext = SparkSession.builder().config(sc.getConf).getOrCreate().sqlContext
     import sql.implicits._
 
     val lr = new LogisticRegression()
-      .setMaxIter(10)
-      .setThreshold(0.5)
+      .setMaxIter(ap.maxIteration)
+      .setThreshold(ap.threshold)
       .setRegParam(ap.regParam)
 
     val labels: Seq[Double] = pd.categoryMap.keys.toSeq

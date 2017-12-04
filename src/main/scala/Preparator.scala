@@ -28,7 +28,6 @@ import grizzled.slf4j.Logger
 case class PreparatorParams(
   nGram: Int,
   numFeatures: Int = 15000,
-  sppmi: Boolean,
   locale: String
 ) extends Params
 
