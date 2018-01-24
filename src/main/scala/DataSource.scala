@@ -92,7 +92,7 @@ class DataSource (
       // Prepare test data for fold.
       val test = data.filter(_._2 % dsp.evalK.get == k)
         .map(_._1)
-        .map(e => (Query(e.text), ActualResult(e.category)))
+        .map(e => (Query(e.text), ActualResult(e.classification)))
 
       (train, new EmptyEvaluationInfo, test)
     }
@@ -106,7 +106,7 @@ class DataSource (
 case class Observation(
   label: Double,
   text: String,
-  category: String
+  classification: String
 )
 
 /** TrainingData class serving as a wrapper for all

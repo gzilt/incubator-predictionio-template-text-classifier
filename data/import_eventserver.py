@@ -2,8 +2,9 @@
 Import sample data for classification engine
 """
 
-import predictionio
 import argparse
+import predictionio
+
 
 def import_events(client, file):
   f = open(file, 'r')

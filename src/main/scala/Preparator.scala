@@ -57,15 +57,14 @@ class Preparator(pp: PreparatorParams)
     val transformedData: RDD[(LabeledPoint)] = tfIdfModel.transform(doc)
 
     // Finally extract category map, associating label to category.
-    val categoryMap = td.data.map(obs => (obs.label, obs.category)).collectAsMap.toMap
+    val classificationMap = td.data.map(obs => (obs.label, obs.classification)).collectAsMap.toMap
 
     new PreparedData(
       tfIdf = tfIdfModel,
       transformedData = transformedData,
-      categoryMap = categoryMap
+      classificationMap = classificationMap
     )
   }
-
 }
 
 class TFHasher(
@@ -137,5 +136,5 @@ class TFIDFModel(
 class PreparedData(
   val tfIdf: TFIDFModel,
   val transformedData: RDD[LabeledPoint],
-  val categoryMap: Map[Double, String]
+  val classificationMap: Map[Double, String]
 ) extends Serializable

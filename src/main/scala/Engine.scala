@@ -13,7 +13,7 @@ case class Query(text: String)
   * prediction confidence.
   */
 case class PredictedResult(
-  category: String,
+  classification: String,
   confidence: Double)
 
 case class PredictedResults(predictions: Seq[PredictedResult])
@@ -21,7 +21,7 @@ case class PredictedResults(predictions: Seq[PredictedResult])
 /** Define ActualResult class which serves as a wrapper
   * for an observation's true class label.
   */
-case class ActualResult(category: String)
+case class ActualResult(classification: String)
 
 /** Define Engine */
 object TextClassificationEngine extends EngineFactory {

@@ -28,7 +28,7 @@ class NBAlgorithm(
 
     new NBModel(
       tfIdf = pd.tfIdf,
-      categoryMap = pd.categoryMap,
+      classificationMap = pd.classificationMap,
       nb = nb)
   }
 
@@ -40,7 +40,7 @@ class NBAlgorithm(
 
 class NBModel(
   val tfIdf: TFIDFModel,
-  val categoryMap: Map[Double, String],
+  val classificationMap: Map[Double, String],
   val nb: NaiveBayesModel
 ) extends Serializable {
 
@@ -84,7 +84,7 @@ class NBModel(
     val sorted = y.sortWith(_._2 > _._2)
     val resultList = new ListBuffer[(PredictedResult)]()
     sorted.foreach(item => {
-      if (item._2 > 0.001) resultList.append(PredictedResult(categoryMap.getOrElse(item._1, ""), item._2))
+      if (item._2 > 0.001) resultList.append(PredictedResult(classificationMap.getOrElse(item._1, ""), item._2))
     })
     PredictedResults(resultList)
   }

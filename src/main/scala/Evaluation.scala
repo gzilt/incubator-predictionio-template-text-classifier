@@ -18,7 +18,7 @@ case class Accuracy()
     actual: ActualResult
   ) : Double = {
     val result = predicted.predictions.maxBy(_.confidence)
-    if (result.category == actual.category) 1.0 else 0.0
+    if (result.classification == actual.classification) 1.0 else 0.0
   }
 }
 

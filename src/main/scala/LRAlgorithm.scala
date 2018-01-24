@@ -28,7 +28,7 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
       .setThreshold(ap.threshold)
       .setRegParam(ap.regParam)
 
-    val labels: Seq[Double] = pd.categoryMap.keys.toSeq
+    val labels: Seq[Double] = pd.classificationMap.keys.toSeq
 
     val data = labels.foldLeft(pd.transformedData.map { case LabeledPoint(label, feature) =>
       // Convert old LabeledPoint to ML's LabeledPoint
@@ -56,7 +56,7 @@ class LRAlgorithm(val ap: LRAlgorithmParams)
 
     new LRModel(
       tfIdf = pd.tfIdf,
-      categoryMap = pd.categoryMap,
+      classificationMap = pd.classificationMap,
       lrModels = lrModels
     )
   }
@@ -73,7 +73,7 @@ case class LREstimate (
 
 class LRModel(
   val tfIdf: TFIDFModel,
-  val categoryMap: Map[Double, String],
+  val classificationMap: Map[Double, String],
   val lrModels: Seq[(Double, LREstimate)]) extends Serializable {
 
   /** Enable vector inner product for prediction. */
@@ -101,7 +101,7 @@ class LRModel(
     val sorted = predTest.sortWith(_._2 > _._2)
     val resultList = new ListBuffer[(PredictedResult)]()
     sorted.foreach(item => {
-      if (item._2 > 0.001) resultList.append(PredictedResult(categoryMap(item._1), item._2))
+      if (item._2 > 0.001) resultList.append(PredictedResult(classificationMap(item._1), item._2))
     })
     PredictedResults(resultList)
   }
