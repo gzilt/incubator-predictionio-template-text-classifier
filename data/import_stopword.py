@@ -31,7 +31,8 @@ if __name__ == '__main__':
         description="Import sample data for classification engine")
     parser.add_argument('--access_key', default='invald_access_key')
     parser.add_argument('--url', default="http://localhost:7070")
-    parser.add_argument('--file', default="./stopwords.txt")
+    parser.add_argument('--file', default="./stopwords_en.txt")
+    parser.add_argument('--test', default=True)
 
     args = parser.parse_args()
     print(args)

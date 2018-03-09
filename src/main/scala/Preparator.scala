@@ -109,7 +109,6 @@ class TFHasher(
     .sliding(nGram)
     .map(_.mkString)
     .toArray
-
     hasher.transform(newList)
   }
 }

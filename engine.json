@@ -4,7 +4,7 @@
   "engineFactory": "org.example.textclassification.TextClassificationEngine",
   "datasource": {
     "params": {
-      "appName": "pio-text-classifier"
+      "appName": "mcontent-ai-testing"
     }
   },
   "preparator": {
@@ -16,11 +16,9 @@
   },
   "algorithms": [
     {
-      "name": "lr",
+      "name": "nb",
       "params": {
-        "regParam": 0.00000005,
-        "maxIteration": 10,
-        "threshold": 0.5
+        "lambda": 0.5
       }
     }
   ]
