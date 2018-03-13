@@ -7,3 +7,8 @@ manifest.json
 best.json
 pio.log
 pio.sbt
+data/dataset
+data/dataset_oroginal
+data/txt_dataset
+data/txt_dataset_original
+data/txt_dataset_test
