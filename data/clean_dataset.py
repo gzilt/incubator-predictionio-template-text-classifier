@@ -22,36 +22,36 @@ def import_events(client, file, output_type):
     reps = {
 
         #technewsworld
-        r'TECH\sTREK': ' ',
-        r'CONFERENCE\sREPORT': ' ',
-        r'ANALYST\sCORNER': ' ',
-        r'LINUX\sPICKS\sAND\sPANS': ' ',
-        r'SPOTLIGHT\sON\sSECURITY': ' ',
-        r'GADGET\sDREAMS\sAND\sNIGHTMARES': ' ',
-        r'CROWDFUNDING\sSPOTLIGHT': ' ',
-        r'TECHNOLOGY\sLAW\sCORNER': ' ',
-        r'LINUX\sBLOG\sSAFARI': ' ',
-        r'GOVERNMENT\sIT\sREPORT': ' ',
-        r'WHICH\sAPPS\sDO\sI\sNEED?': ' ',
-        r'EXCLUSIVE\sINTERVIEW': ' ',
-        r'EXPERT\sADVICE': ' ',
-        r'PRODUCT\sPROFILE': ' ',
-        r'BOOK\sREVIEW': ' ',
-        r'ANDROID\sAPP\sREVIEW': ' ',
-        r'CRM\sBLOG\sSAFARI': ' ',
-        r'WEEKLY\sRECAP': ' ',
-        r'STARTUP\sTO\sWATCH': ' ',
-        r'WEEKEND\sFEATURE': ' ',
-        r'NEWS\sBRIEF': ' ',
-        r'TECH\sBLOG': ' ',
-        r'ANDROID\sAPP': ' ',
-        r'APP\sREVIEW': ' ',
-        r'OPINION': ' ',
-        r'PODCAST': ' ',
-        r'INSIGHTS': ' ',
-        r'ANALYSIS': ' ',
-        r'REVIEW': ' ',
-        r'PRODUCT': ' ',
+        # r'TECH\sTREK': ' ',
+        # r'CONFERENCE\sREPORT': ' ',
+        # r'ANALYST\sCORNER': ' ',
+        # r'LINUX\sPICKS\sAND\sPANS': ' ',
+        # r'SPOTLIGHT\sON\sSECURITY': ' ',
+        # r'GADGET\sDREAMS\sAND\sNIGHTMARES': ' ',
+        # r'CROWDFUNDING\sSPOTLIGHT': ' ',
+        # r'TECHNOLOGY\sLAW\sCORNER': ' ',
+        # r'LINUX\sBLOG\sSAFARI': ' ',
+        # r'GOVERNMENT\sIT\sREPORT': ' ',
+        # r'WHICH\sAPPS\sDO\sI\sNEED?': ' ',
+        # r'EXCLUSIVE\sINTERVIEW': ' ',
+        # r'EXPERT\sADVICE': ' ',
+        # r'PRODUCT\sPROFILE': ' ',
+        # r'BOOK\sREVIEW': ' ',
+        # r'ANDROID\sAPP\sREVIEW': ' ',
+        # r'CRM\sBLOG\sSAFARI': ' ',
+        # r'WEEKLY\sRECAP': ' ',
+        # r'STARTUP\sTO\sWATCH': ' ',
+        # r'WEEKEND\sFEATURE': ' ',
+        # r'NEWS\sBRIEF': ' ',
+        # r'TECH\sBLOG': ' ',
+        # r'ANDROID\sAPP': ' ',
+        # r'APP\sREVIEW': ' ',
+        # r'OPINION': ' ',
+        # r'PODCAST': ' ',
+        # r'INSIGHTS': ' ',
+        # r'ANALYSIS': ' ',
+        # r'REVIEW': ' ',
+        # r'PRODUCT': ' ',
 
         
         #autoblog
@@ -303,17 +303,19 @@ def import_events(client, file, output_type):
 
     root = tree.getroot()
     for child in root:
-        meta_title = child.find('meta_title')
-        canonical = child.find('meta_canonical')
-        content = child.find('content')
         has_error = child.find('errorInfo')
 
         if has_error is not None:
             error_count += 1
             continue
 
+        #meta_title = child.find('meta_title')
+        canonical = child.find('meta_canonical')
+        content = child.find('content')
+        #loadTime = child.find('loadTime')
+
         url = ''
-        if content is not None:
+        if content is not None and content.text is not None:
             if canonical is not None and canonical.text is not None:
                 if canonical.text in temp_list_canonical:
                     duplicate_count += 1
@@ -333,9 +335,17 @@ def import_events(client, file, output_type):
             temp_text = content.text
 
             #print('ERROR')
-            #print(content.text)
+            #print(loadTime.text)
 
-            text = strip_tags(cleaner.clean_html(replace_all(content.text, reps).rstrip().replace('\n', ' ').replace('\r', ' ')))
+            temp = replace_all(content.text, reps).rstrip().replace('\n', ' ').replace('\r', ' ')
+
+            if temp is None or temp == '':
+                error_count += 1
+                continue
+
+            print('--'+temp+'&&&')
+
+            text = strip_tags(cleaner.clean_html(temp))
 
             # if title == text or len(text) < 500:
             #     content_too_short += 1
@@ -347,8 +357,8 @@ def import_events(client, file, output_type):
             # print ()
             # print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
             # print(title)
-            print('--------------------------------------------------------------------------------------------------------------')
-            print(text)
+            #print('--------------------------------------------------------------------------------------------------------------')
+            #print(text)
             # print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
             # words = strip_punctuation(text).split()
@@ -460,7 +470,7 @@ if __name__ == '__main__':
         description="Import sample data for classification engine")
     parser.add_argument('--access_key', default='invald_access_key')
     parser.add_argument('--url', default="http://localhost:7070")
-    parser.add_argument('--file', default="AI-TRAINING_TECHNOLOGY & COMPUTING_ZNkgAMJ8zDp6t7vX4.xml")
+    parser.add_argument('--file', default="AI-TRAINING_TRAVEL_MuCNpRK8E3EdJ8h4u.xml")
     parser.add_argument('--output_type', default="json")
 
     args = parser.parse_args()
