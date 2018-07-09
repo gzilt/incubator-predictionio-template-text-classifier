@@ -1,4 +1,4 @@
-package org.example.textclassification
+package com.github.gzilt.text.classifier
 
 import org.apache.predictionio.controller.EngineFactory
 import org.apache.predictionio.controller.Engine

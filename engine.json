@@ -1,7 +1,7 @@
 {
   "id": "default",
   "description": "Default settings",
-  "engineFactory": "org.example.textclassification.TextClassificationEngine",
+  "engineFactory": "com.github.gzilt.text.classifier.TextClassificationEngine",
   "datasource": {
     "params": {
       "appName": "mcontent-ai-testing"

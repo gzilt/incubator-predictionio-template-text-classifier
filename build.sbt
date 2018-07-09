@@ -1,4 +1,4 @@
-name := "org.example.textclassification"
+name := "com.github.gzilt.text.classifier"
 
 scalaVersion := "2.11.8"
 libraryDependencies ++= Seq(
